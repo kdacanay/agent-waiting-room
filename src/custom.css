@@ -1,0 +1,45 @@
+/* === Weichert Brand Colors === */
+:root {
+  --weichert-yellow: #FFCC00;
+  --weichert-black: #000000;
+  --weichert-light-gray: #F5F5F5;
+}
+
+/* === Full-page watermark === */
+body {
+  position: relative;
+  background-color: var(--weichert-light-gray);
+}
+
+body::before {
+  content: "";
+  background: url('./assets/WeichertLogoCoverImage.png') center center no-repeat fixed;
+  background-size: 70%;
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  opacity: 0.05;   /* ✅ only the watermark is faded */
+  z-index: -1;
+}
+
+/* === Buttons === */
+.btn-weichert {
+  background-color: var(--weichert-yellow);
+  color: var(--weichert-black);
+  border: none;
+}
+
+.btn-weichert:hover {
+  background-color: #e6b800;
+  color: var(--weichert-black);
+}
+
+.btn-home {
+  background-color: var(--weichert-black);
+  color: #ffffff;
+}
+
+.btn-home:hover {
+  background-color: #333333;
+  color: #ffffff;
+}
+
