@@ -1,8 +1,18 @@
-import React, { useState } from 'react';
-import { useParams, Link } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
+import { useParams, Link, useNavigate } from 'react-router-dom';
+import { useUser } from '../UserContext';
 
 export default function WaitingRoomForm() {
   const { roomType } = useParams();
+  const { user, agentProfile } = useUser();
+  const navigate = useNavigate();
+
+  // ✅ Redirect to login if not authenticated
+  useEffect(() => {
+    if (!user) {
+      navigate('/login');
+    }
+  }, [user, navigate]);
 
   const [formData, setFormData] = useState({
     name: '',
@@ -11,12 +21,26 @@ export default function WaitingRoomForm() {
     office: '',
     availableDays: [],
     preferredTime: '',
+    openHouseGoal: '',
     preferredTasks: [],
     requestedTraining: []
   });
 
   const [successMessage, setSuccessMessage] = useState('');
   const [errorMessage, setErrorMessage] = useState('');
+
+  // ✅ Auto-fill when agentProfile loads
+  useEffect(() => {
+    if (agentProfile) {
+      setFormData((prev) => ({
+        ...prev,
+        name: agentProfile.name || '',
+        email: agentProfile.email || '',
+        phone: agentProfile.phone || '',
+        office: agentProfile.office || ''
+      }));
+    }
+  }, [agentProfile]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -45,6 +69,7 @@ export default function WaitingRoomForm() {
       office: formData.office,
       availableDays: formData.availableDays.join(', '),
       preferredTime: formData.preferredTime,
+      openHouseGoal: formData.openHouseGoal,
       waitingRoomType: roomType,
       preferredTasks: formData.preferredTasks.join(', '),
       requestedTraining: formData.requestedTraining.join(', ')
@@ -64,12 +89,13 @@ export default function WaitingRoomForm() {
         setSuccessMessage('✅ Submitted successfully! We\'ll be in touch.');
         setErrorMessage('');
         setFormData({
-          name: '',
-          email: '',
-          phone: '',
-          office: '',
+          name: agentProfile?.name || '',
+          email: agentProfile?.email || '',
+          phone: agentProfile?.phone || '',
+          office: agentProfile?.office || '',
           availableDays: [],
           preferredTime: '',
+          openHouseGoal: '',
           preferredTasks: [],
           requestedTraining: []
         });
@@ -83,16 +109,13 @@ export default function WaitingRoomForm() {
       setSuccessMessage('');
     }
   };
-  function toTitleCase(str) {
-    return str
-      .replace(/-/g, ' ')
-      .replace(/\b\w/g, char => char.toUpperCase());
-  }
 
+  function toTitleCase(str) {
+    return str.replace(/-/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
+  }
 
   return (
     <div className="container py-5">
-      {/* ✅ Only the Home button at the top */}
       <div className="text-center mb-4">
         <Link to="/" className="btn btn-home mt-3">🏠 Home</Link>
       </div>
@@ -110,7 +133,6 @@ export default function WaitingRoomForm() {
         <h2 className="text-center mb-4">
           Join the {toTitleCase(roomType)} Waiting Room
         </h2>
-
 
         {successMessage && (
           <div className="alert alert-success">{successMessage}</div>
@@ -177,58 +199,70 @@ export default function WaitingRoomForm() {
             </select>
           </div>
 
-          {roomType !== 'Training' && (
-            <div className="mb-3">
-              <label className="form-label">Available Days</label>
-              {['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'].map(day => (
-                <div key={day} className="form-check">
-                  <input
-                    className="form-check-input"
-                    type="checkbox"
-                    value={day}
-                    checked={formData.availableDays.includes(day)}
-                    onChange={handleAvailableDaysChange}
-                    id={`day-${day}`}
-                  />
-                  <label className="form-check-label" htmlFor={`day-${day}`}>
-                    {day}
-                  </label>
-                </div>
-              ))}
-            </div>
+          {roomType === 'open-house' && (
+            <>
+              <div className="mb-3">
+                <label className="form-label">Available Days</label>
+                {['Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday'].map(day => (
+                  <div key={day} className="form-check">
+                    <input
+                      className="form-check-input"
+                      type="checkbox"
+                      value={day}
+                      checked={formData.availableDays.includes(day)}
+                      onChange={handleAvailableDaysChange}
+                      id={`day-${day}`}
+                    />
+                    <label className="form-check-label" htmlFor={`day-${day}`}>
+                      {day}
+                    </label>
+                  </div>
+                ))}
+              </div>
+
+              <div className="mb-4">
+                <label className="form-label">Preferred Time</label>
+                {[
+                  'Morning (9am - 11am)',
+                  'Afternoon (12pm - 4pm)',
+                  'Evening (5pm - 9pm)',
+                  'Anytime'
+                ].map(time => (
+                  <div key={time} className="form-check">
+                    <input
+                      className="form-check-input"
+                      type="radio"
+                      name="preferredTime"
+                      value={time}
+                      checked={formData.preferredTime === time}
+                      onChange={handleChange}
+                      id={`time-${time}`}
+                    />
+                    <label className="form-check-label" htmlFor={`time-${time}`}>
+                      {time}
+                    </label>
+                  </div>
+                ))}
+              </div>
+
+              <div className="mb-3">
+                <label className="form-label">What is your open house goal?</label>
+                <input
+                  type="text"
+                  name="openHouseGoal"
+                  value={formData.openHouseGoal}
+                  onChange={handleChange}
+                  className="form-control"
+                  placeholder="Ex: I want to do 3 open houses this month"
+                />
+              </div>
+            </>
           )}
 
-          {roomType !== 'Training' && (
-            <div className="mb-4">
-              <label className="form-label">Preferred Time</label>
-              {[
-                'Morning (9am - 11am)',
-                'Afternoon (12pm - 4pm)',
-                'Evening (5pm - 9pm)',
-                'Anytime'
-              ].map(time => (
-                <div key={time} className="form-check">
-                  <input
-                    className="form-check-input"
-                    type="radio"
-                    name="preferredTime"
-                    value={time}
-                    checked={formData.preferredTime === time}
-                    onChange={handleChange}
-                    id={`time-${time}`}
-                  />
-                  <label className="form-check-label" htmlFor={`time-${time}`}>
-                    {time}
-                  </label>
-                </div>
-              ))}
-            </div>
-          )}
-
-          {roomType === 'Call Center' && (
+          {roomType === 'call-center' && (
             <div className="mb-3">
               <label className="form-label">Preferred Tasks</label>
-              {['Cold Calling', 'FSBO', 'Expired Listings', 'Farming', 'Old Contacts', 'Seasonal'].map(task => (
+              {['Cold Calling','FSBO','Expired Listings','Farming','Old Contacts','Seasonal'].map(task => (
                 <div key={task} className="form-check">
                   <input
                     className="form-check-input"
@@ -246,10 +280,10 @@ export default function WaitingRoomForm() {
             </div>
           )}
 
-          {roomType === 'Training' && (
+          {roomType === 'training' && (
             <div className="mb-3">
               <label className="form-label">Requested Training</label>
-              {['Cole Realty', 'Bold Trail', 'myWeichert', 'Broker Mint', 'Call Center', 'Open House', 'Listings'].map(training => (
+              {['Cole Realty','Bold Trail','myWeichert','Broker Mint','Call Center','Open House','Listings'].map(training => (
                 <div key={training} className="form-check">
                   <input
                     className="form-check-input"

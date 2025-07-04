@@ -43,3 +43,33 @@ body::before {
   color: #ffffff;
 }
 
+.btn-weichert {
+  background-color: #FFCC00;
+  color: #000;
+  border: none;
+}
+
+.btn-weichert:hover {
+  background-color: #e6b800;
+  color: #000;
+}
+.btn-weichert {
+  background-color: #FFCC00;
+  color: #000;
+  border: none;
+}
+
+.btn-weichert:hover {
+  background-color: #e6b800;
+  color: #000;
+}
+.btn-weichert {
+  background-color: #FFCC00;
+  color: #000;
+  border: none;
+}
+
+.btn-weichert:hover {
+  background-color: #e6b800;
+  color: #000;
+}
