@@ -1,25 +1,38 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { useUser } from '../UserContext';
-import { Navigate } from 'react-router-dom';
 
 export default function Dashboard() {
-  const { user, agentProfile } = useUser();
-
-  if (!user) {
-    return <Navigate to="/" />;
-  }
+  const { user } = useUser();
 
   return (
-    <div className="container text-center py-5">
-      <h2>Welcome, {agentProfile?.name || 'Agent'}!</h2>
-      <p>Select which waiting room you’d like to join:</p>
+    <div className="container fade-in py-5 text-center">
+      <h1 className="mb-4">Welcome, {user?.displayName || 'Agent'}!</h1>
+      <p className="mb-5">Select which waiting room you’d like to join:</p>
 
-      <div className="d-flex flex-column align-items-center">
-        <Link to="/waiting-room/open-house" className="btn btn-weichert my-2 w-50">Open House</Link>
-        <Link to="/waiting-room/call-center" className="btn btn-weichert my-2 w-50">Call Center</Link>
-        <Link to="/waiting-room/training" className="btn btn-weichert my-2 w-50">Training</Link>
-      </div>
+      <Link
+        to="/waiting-room/open-house"
+        className="btn btn-dark m-2 bounce-link bounce-delay-1"
+        style={{ backgroundColor: '#FFCC00', color: '#000' }}
+      >
+        🏡 Join Open House Waiting Room
+      </Link>
+
+      <Link
+        to="/waiting-room/call-center"
+        className="btn btn-dark m-2 bounce-link bounce-delay-2"
+        style={{ backgroundColor: '#FFCC00', color: '#000' }}
+      >
+        📞 Join Call Center Waiting Room
+      </Link>
+
+      <Link
+        to="/waiting-room/training"
+        className="btn btn-dark m-2 bounce-link bounce-delay-3"
+        style={{ backgroundColor: '#FFCC00', color: '#000' }}
+      >
+        📚 Join Training Waiting Room
+      </Link>
     </div>
   );
 }

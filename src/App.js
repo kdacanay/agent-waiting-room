@@ -14,6 +14,8 @@ import Profile from './components/Profile';
 import WaitingRoomForm from './components/WaitingRoomForm';
 import Dashboard from './components/Dashboard';
 import Listings from './components/Listings';
+import UpcomingCallCenter from './components/UpcomingCallCenter';
+import UpcomingTraining from './components/UpcomingTraining';
 
 export default function App() {
   return (
@@ -27,6 +29,8 @@ export default function App() {
   <Route path="/dashboard" element={<Dashboard />} />   {/* ✅ New! */}
    <Route path="/listings" element={<Listings />} />
   <Route path="/waiting-room/:roomType" element={<WaitingRoomForm />} />
+  <Route path="/upcoming-call-center" element={<UpcomingCallCenter />} />
+<Route path="/upcoming-training" element={<UpcomingTraining />} />
         </Routes>
       </Router>
     </UserProvider>
