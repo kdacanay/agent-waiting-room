@@ -2,6 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import { useUser } from '../UserContext';
 
+
+
 export default function WaitingRoomForm() {
   const { roomType } = useParams();
   const { user, agentProfile } = useUser();
@@ -119,7 +121,13 @@ export default function WaitingRoomForm() {
       <div className="text-center mb-4">
         <Link to="/" className="btn btn-home mt-3">🏠 Home</Link>
       </div>
-
+      {roomType === 'open-house' && (
+        <div className="text-center mb-4">
+          <Link to="/listings" className="btn btn-outline-dark">
+            📋 View All Listings
+          </Link>
+        </div>
+      )}
       <div
         className="mx-auto"
         style={{

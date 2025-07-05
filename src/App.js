@@ -13,6 +13,7 @@ import Signup from './components/Signup';
 import Profile from './components/Profile';
 import WaitingRoomForm from './components/WaitingRoomForm';
 import Dashboard from './components/Dashboard';
+import Listings from './components/Listings';
 
 export default function App() {
   return (
@@ -24,6 +25,7 @@ export default function App() {
   <Route path="/signup" element={<Signup />} />
   <Route path="/profile" element={<Profile />} />
   <Route path="/dashboard" element={<Dashboard />} />   {/* ✅ New! */}
+   <Route path="/listings" element={<Listings />} />
   <Route path="/waiting-room/:roomType" element={<WaitingRoomForm />} />
         </Routes>
       </Router>
