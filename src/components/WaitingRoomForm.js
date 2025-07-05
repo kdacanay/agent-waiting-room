@@ -21,9 +21,19 @@ export default function WaitingRoomForm() {
 
   const [statusMessage, setStatusMessage] = useState('');
 
-  useEffect(() => {
-    if (!user) navigate('/');
-  }, [user, navigate]);
+useEffect(() => {
+  if (!user) {
+    navigate('/');
+  } else {
+    setFormData(prev => ({
+      ...prev,
+      name: user.displayName || '',
+      email: user.email || '',
+      phone: user.phoneNumber || '',
+      office: user.office || ''
+    }));
+  }
+}, [user, roomType, navigate]);
 
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
@@ -42,44 +52,67 @@ export default function WaitingRoomForm() {
     }
   };
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    setStatusMessage('Submitting...');
+const handleSubmit = async (e) => {
+  e.preventDefault();
+  setStatusMessage('Submitting...');
 
-    const payload = {
-      ...formData,
-      waitingRoomType: roomType,
-      submittedOn: new Date().toISOString()
-    };
-
-    try {
-      const response = await fetch('https://default9467b82f9011484fa3be93bfc08381.8e.environment.api.powerplatform.com:443/powerautomate/automations/direct/workflows/991d8cf2fdc44cfbbe5dbd43828da76b/triggers/manual/paths/invoke/?api-version=1&tenantId=tId&environmentName=Default-9467b82f-9011-484f-a3be-93bfc083818e&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=p9LvS1TZUKvpuQYolMDcw2srB3OhLWFte7EBqQR59S8', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload)
-      });
-
-      if (response.ok) {
-        setStatusMessage('✅ Submitted successfully!');
-        setFormData({
-          name: '',
-          email: '',
-          phone: '',
-          office: '',
-          availableDays: [],
-          preferredTime: '',
-          openHouseGoal: '',
-          preferredTasks: [],
-          trainingNeeded: []
-        });
-      } else {
-        setStatusMessage('❌ Submission failed. Please try again.');
-      }
-    } catch (error) {
-      console.error(error);
-      setStatusMessage('❌ Submission error. Please check your connection.');
-    }
+  let payload = {
+    name: formData.name || '',
+    email: formData.email || '',
+    phone: formData.phone || '',
+    office: formData.office || '',
+    waitingRoomType: roomType || '',
+    openHouseGoal: '',
+    availableDays: '',
+    preferredTime: '',
+    preferredTasks: '',
+    requestedTraining: ''
   };
+
+  if (roomType === 'open-house') {
+    payload.availableDays = formData.availableDays.join(', ');
+    payload.preferredTime = formData.preferredTime || '';
+    payload.openHouseGoal = formData.openHouseGoal || '';
+  }
+
+  if (roomType === 'call-center') {
+    payload.preferredTasks = formData.preferredTasks.join(', ');
+  }
+
+  if (roomType === 'training') {
+    payload.requestedTraining = formData.trainingNeeded.join(', ');
+  }
+
+  console.log('Payload:', payload);
+
+  try {
+    const response = await fetch('https://default9467b82f9011484fa3be93bfc08381.8e.environment.api.powerplatform.com:443/powerautomate/automations/direct/workflows/991d8cf2fdc44cfbbe5dbd43828da76b/triggers/manual/paths/invoke/?api-version=1&tenantId=tId&environmentName=Default-9467b82f-9011-484f-a3be-93bfc083818e&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=p9LvS1TZUKvpuQYolMDcw2srB3OhLWFte7EBqQR59S8', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload)
+    });
+
+    if (response.ok) {
+      setStatusMessage('✅ Submitted successfully!');
+      setFormData({
+        name: '',
+        email: '',
+        phone: '',
+        office: '',
+        availableDays: [],
+        preferredTime: '',
+        openHouseGoal: '',
+        preferredTasks: [],
+        trainingNeeded: []
+      });
+    } else {
+      setStatusMessage('❌ Submission failed. Please try again.');
+    }
+  } catch (error) {
+    console.error(error);
+    setStatusMessage('❌ Submission error. Please check your connection.');
+  }
+};
 
   const officeOptions = [
     '', 'BlueBell', 'ChaddsFord', 'Collegeville',

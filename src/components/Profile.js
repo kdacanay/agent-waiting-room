@@ -1,100 +1,70 @@
+// src/components/Profile.js
 import React, { useState } from 'react';
 import { useUser } from '../UserContext';
-import { Navigate } from 'react-router-dom';
-import { storage, db } from '../firebase';
-import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
+import { db, storage } from '../firebase';
 import { doc, updateDoc } from 'firebase/firestore';
+import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 
 export default function Profile() {
-  const { user, agentProfile } = useUser();
-  const [photoFile, setPhotoFile] = useState(null);
+  const { user, loading } = useUser();
   const [uploading, setUploading] = useState(false);
-  const [uploadError, setUploadError] = useState('');
-
-  if (!user) {
-    return <Navigate to="/" />;
-  }
-
-  if (!agentProfile) {
-    return <p>Loading profile...</p>;
-  }
 
   const handlePhotoUpload = async (e) => {
-    e.preventDefault();
-    if (!photoFile) {
-      setUploadError('Please select a file.');
-      return;
-    }
+    if (!user) return;
+    const file = e.target.files[0];
+    if (!file) return;
 
+    setUploading(true);
     try {
-      setUploading(true);
       const storageRef = ref(storage, `profilePhotos/${user.uid}`);
-      await uploadBytes(storageRef, photoFile);
+      await uploadBytes(storageRef, file);
       const downloadURL = await getDownloadURL(storageRef);
 
-      // ✅ Update Firestore user doc
-      const userDocRef = doc(db, 'users', user.uid);
-      await updateDoc(userDocRef, { photoURL: downloadURL });
+      const userRef = doc(db, 'users', user.uid);
+      await updateDoc(userRef, { photoURL: downloadURL });
 
-      setUploadError('');
-      setUploading(false);
-      setPhotoFile(null);
-      alert('Profile photo updated!');
-    } catch (err) {
-      console.error(err);
-      setUploadError('Upload failed. Please try again.');
-      setUploading(false);
+      alert('✅ Profile photo updated! Refresh to see changes.');
+    } catch (error) {
+      console.error('Upload error:', error);
+      alert('❌ Error uploading photo.');
     }
+    setUploading(false);
   };
+
+  if (loading) return <p className="text-center my-4">Loading profile...</p>;
+  if (!user) return <p className="text-center my-4">You’re not signed in.</p>;
 
   return (
     <div className="container py-5 text-center">
-      <h2>Your Profile</h2>
+<img
+  src={user.photoURL || 'https://via.placeholder.com/160'}
+  alt="Profile"
+  width="160"
+  height="160"
+  style={{
+    objectFit: 'cover',
+    boxShadow: '0 0 5px rgba(0,0,0,0.2)'
+  }}
+  className="rounded-circle mb-3 border border-dark"
+/>
 
-      {agentProfile.photoURL && (
-        <img 
-          src={agentProfile.photoURL}
-          alt="Profile"
-          style={{
-            width: '150px',
-            height: '150px',
-            objectFit: 'cover',
-            borderRadius: '50%',
-            marginBottom: '20px'
-          }}
-        />
-      )}
 
-      <p><strong>Name:</strong> {agentProfile.name}</p>
-      <p><strong>Email:</strong> {agentProfile.email}</p>
-      <p><strong>Phone:</strong> {agentProfile.phone}</p>
-      <p><strong>Office:</strong> {agentProfile.office}</p>
 
-      <hr />
+      <h3>{user.displayName || 'No Name'}</h3>
+      <p><strong>Email:</strong> {user.email}</p>
+      <p><strong>Phone:</strong> {user.phoneNumber || 'N/A'}</p>
+      <p><strong>Office:</strong> {user.office || 'N/A'}</p>
 
-      <h5>Update Profile Photo</h5>
-
-      <form onSubmit={handlePhotoUpload} className="mb-3">
+      <label className="btn btn-dark mt-3">
+        {uploading ? 'Uploading...' : 'Upload New Photo'}
         <input
           type="file"
           accept="image/*"
-          onChange={(e) => setPhotoFile(e.target.files[0])}
-          className="form-control mb-2"
+          onChange={handlePhotoUpload}
+          hidden
         />
-
-        {uploadError && (
-          <div className="alert alert-danger">{uploadError}</div>
-        )}
-
-        <button
-          type="submit"
-          className="btn btn-weichert"
-          disabled={uploading}
-          style={{ backgroundColor: '#FFCC00', color: '#000' }}
-        >
-          {uploading ? 'Uploading...' : 'Upload Photo'}
-        </button>
-      </form>
+      </label>
     </div>
   );
 }
+

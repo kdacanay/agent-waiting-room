@@ -1,55 +1,62 @@
+// src/components/Header.js
 import React from 'react';
-import { Link } from 'react-router-dom';
 import { useUser } from '../UserContext';
+import { Link, useNavigate } from 'react-router-dom';
 import { auth } from '../firebase';
-import { signOut } from 'firebase/auth';
 
 export default function Header() {
-  const { user, agentProfile } = useUser();
+  const { user, loading } = useUser();
+  const navigate = useNavigate();
 
   const handleLogout = async () => {
-    await signOut(auth);
+    await auth.signOut();
+    navigate('/');
   };
 
-  if (!user) return null; // Hide header if not logged in
-
   return (
-    <div className="bg-dark text-white py-2 px-4 d-flex justify-content-between align-items-center">
-      <div className="d-flex align-items-center">
-        {/* ✅ Show profile photo if available */}
-        {agentProfile?.photoURL ? (
-          <img
-            src={agentProfile.photoURL}
-            alt="Profile"
-            style={{
-              width: '40px',
-              height: '40px',
-              borderRadius: '50%',
-              objectFit: 'cover',
-              marginRight: '10px'
-            }}
-          />
-        ) : (
-          <div 
-            className="bg-secondary text-white d-flex align-items-center justify-content-center"
-            style={{
-              width: '40px',
-              height: '40px',
-              borderRadius: '50%',
-              marginRight: '10px'
-            }}
-          >
-            {agentProfile?.name?.charAt(0).toUpperCase() || 'A'}
+    <nav className="navbar navbar-expand-lg" style={{ backgroundColor: '#FFCC00' }}>
+      <div className="container-fluid d-flex justify-content-between align-items-center">
+        <div className="d-flex align-items-center">
+          {loading ? (
+            <span>Loading profile...</span>
+          ) : user ? (
+            <>
+<img
+  src={user.photoURL || 'https://via.placeholder.com/60'}
+  alt="Profile"
+  width="60"
+  height="60"
+  style={{
+    objectFit: 'cover',
+    boxShadow: '0 0 5px rgba(0,0,0,0.2)'
+  }}
+  className="rounded-circle me-2 border border-dark"
+/>
+
+
+
+              <h5 className="mb-0 fw-bold text-dark">
+                Welcome, {user.displayName || 'Agent'}!
+              </h5>
+            </>
+          ) : (
+            <h5 className="mb-0 text-dark">Not signed in</h5>
+          )}
+        </div>
+        {user && (
+          <div>
+            <Link to="/dashboard" className="btn btn-dark me-2">
+              Dashboard
+            </Link>
+            <Link to="/profile" className="btn btn-outline-dark me-2">
+              Profile
+            </Link>
+            <button onClick={handleLogout} className="btn btn-danger">
+              Logout
+            </button>
           </div>
         )}
-        Welcome, {agentProfile?.name || 'Agent'}!
       </div>
-
-      <div>
-        <Link to="/dashboard" className="btn btn-light btn-sm me-2">Dashboard</Link>
-        <Link to="/profile" className="btn btn-light btn-sm me-2">Profile</Link>
-        <button onClick={handleLogout} className="btn btn-danger btn-sm">Logout</button>
-      </div>
-    </div>
+    </nav>
   );
 }
