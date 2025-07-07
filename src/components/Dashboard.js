@@ -1,38 +1,75 @@
+// src/components/Dashboard.js
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { useUser } from '../UserContext';
+
+import Container from '@mui/material/Container';
+import Typography from '@mui/material/Typography';
+import Stack from '@mui/material/Stack';
+import Button from '@mui/material/Button';
+import Fade from '@mui/material/Fade';
+import PageTransition from './PageTransition';
 
 export default function Dashboard() {
   const { user } = useUser();
 
   return (
-    <div className="container fade-in py-5 text-center">
-      <h1 className="mb-4">Welcome, {user?.displayName || 'Agent'}!</h1>
-      <p className="mb-5">Select which waiting room you’d like to join:</p>
+    <PageTransition>
+      <Container maxWidth="sm" sx={{ textAlign: 'center', py: 5 }}>
+        <Typography variant="h4" gutterBottom>
+          Welcome, {user?.displayName || 'Agent'}!
+        </Typography>
 
-      <Link
-        to="/waiting-room/open-house"
-        className="btn btn-dark m-2 bounce-link bounce-delay-1"
-        style={{ backgroundColor: '#FFCC00', color: '#000' }}
-      >
-        🏡 Join Open House Waiting Room
-      </Link>
+        <Typography variant="body1" sx={{ mb: 4 }}>
+          Select which waiting room you’d like to join:
+        </Typography>
 
-      <Link
-        to="/waiting-room/call-center"
-        className="btn btn-dark m-2 bounce-link bounce-delay-2"
-        style={{ backgroundColor: '#FFCC00', color: '#000' }}
-      >
-        📞 Join Call Center Waiting Room
-      </Link>
+        <Stack spacing={2}>
+          <Fade in={true} timeout={600}>
+            <Button
+              component={Link}
+              to="/waiting-room/open-house"
+              variant="contained"
+              color="primary"
+              sx={{
+                color: '#000',
+                fontWeight: 'bold',
+                '&:hover': { bgcolor: '#f1e000' }
+              }}
+            >
+              🏡 Join Open House Waiting Room
+            </Button>
+          </Fade>
 
-      <Link
-        to="/waiting-room/training"
-        className="btn btn-dark m-2 bounce-link bounce-delay-3"
-        style={{ backgroundColor: '#FFCC00', color: '#000' }}
-      >
-        📚 Join Training Waiting Room
-      </Link>
-    </div>
+          <Button
+            component={Link}
+            to="/waiting-room/call-center"
+            variant="contained"
+            color="primary"
+            sx={{
+              color: '#000',
+              fontWeight: 'bold',
+              '&:hover': { bgcolor: '#f1e000' }
+            }}
+          >
+            📞 Join Call Center Waiting Room
+          </Button>
+
+          <Button
+            component={Link}
+            to="/waiting-room/training"
+            variant="contained"
+            color="primary"
+            sx={{
+              color: '#000',
+              fontWeight: 'bold',
+              '&:hover': { bgcolor: '#f1e000' }
+            }}
+          >
+            📚 Join Training Waiting Room
+          </Button>
+        </Stack>
+      </Container>
+    </PageTransition>
   );
 }

@@ -21,16 +21,16 @@ export default function App() {
   return (
     <UserProvider>
       <Router>
-        <Header />   {/* ✅ Always visible when logged in */}
+        <Header />   {/* ✅ Always visible */}
         <Routes>
-         <Route path="/" element={<Login />} />
-  <Route path="/signup" element={<Signup />} />
-  <Route path="/profile" element={<Profile />} />
-  <Route path="/dashboard" element={<Dashboard />} />   {/* ✅ New! */}
-   <Route path="/listings" element={<Listings />} />
-  <Route path="/waiting-room/:roomType" element={<WaitingRoomForm />} />
-  <Route path="/upcoming-call-center" element={<UpcomingCallCenter />} />
-<Route path="/upcoming-training" element={<UpcomingTraining />} />
+          <Route path="/" element={<Login />} />
+          <Route path="/signup" element={<Signup />} />
+          <Route path="/profile" element={<Profile />} />
+          <Route path="/dashboard" element={<Dashboard />} />
+          <Route path="/listings" element={<Listings />} />
+          <Route path="/waiting-room/:roomType" element={<WaitingRoomForm />} />
+          <Route path="/upcoming-call-center" element={<UpcomingCallCenter />} />
+          <Route path="/upcoming-training" element={<UpcomingTraining />} />
         </Routes>
       </Router>
     </UserProvider>

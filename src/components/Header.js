@@ -4,6 +4,13 @@ import { useUser } from '../UserContext';
 import { Link, useNavigate } from 'react-router-dom';
 import { auth } from '../firebase';
 
+import AppBar from '@mui/material/AppBar';
+import Toolbar from '@mui/material/Toolbar';
+import Typography from '@mui/material/Typography';
+import Avatar from '@mui/material/Avatar';
+import Box from '@mui/material/Box';
+import Button from '@mui/material/Button';
+
 export default function Header() {
   const { user, loading } = useUser();
   const navigate = useNavigate();
@@ -14,49 +21,65 @@ export default function Header() {
   };
 
   return (
-    <nav className="navbar navbar-expand-lg" style={{ backgroundColor: '#FFCC00' }}>
-      <div className="container-fluid d-flex justify-content-between align-items-center">
-        <div className="d-flex align-items-center">
+    <AppBar position="static" color="primary" sx={{ mb: 2 }}>
+      <Toolbar sx={{ display: 'flex', justifyContent: 'space-between' }}>
+        <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
           {loading ? (
-            <span>Loading profile...</span>
+            <Typography variant="body1">Loading profile...</Typography>
           ) : user ? (
             <>
-<img
-  src={user.photoURL || 'https://via.placeholder.com/60'}
-  alt="Profile"
-  width="60"
-  height="60"
-  style={{
-    objectFit: 'cover',
-    boxShadow: '0 0 5px rgba(0,0,0,0.2)'
-  }}
-  className="rounded-circle me-2 border border-dark"
-/>
-
-
-
-              <h5 className="mb-0 fw-bold text-dark">
+              <Avatar
+                alt="Profile"
+                src={user.photoURL || 'https://via.placeholder.com/60'}
+                sx={{
+                  width: 60,
+                  height: 60,
+                  boxShadow: '0 0 5px rgba(0,0,0,0.2)',
+                  border: '2px solid black'
+                }}
+              />
+              <Typography
+                variant="h6"
+                component="div"
+                sx={{ color: 'black', fontWeight: 'bold' }}
+              >
                 Welcome, {user.displayName || 'Agent'}!
-              </h5>
+              </Typography>
             </>
           ) : (
-            <h5 className="mb-0 text-dark">Not signed in</h5>
+            <Typography variant="h6" sx={{ color: 'black' }}>
+              Not signed in
+            </Typography>
           )}
-        </div>
+        </Box>
         {user && (
-          <div>
-            <Link to="/dashboard" className="btn btn-dark me-2">
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+            <Button
+              component={Link}
+              to="/dashboard"
+              variant="contained"
+              color="secondary"
+            >
               Dashboard
-            </Link>
-            <Link to="/profile" className="btn btn-outline-dark me-2">
+            </Button>
+            <Button
+              component={Link}
+              to="/profile"
+              variant="outlined"
+              color="secondary"
+            >
               Profile
-            </Link>
-            <button onClick={handleLogout} className="btn btn-danger">
+            </Button>
+            <Button
+              onClick={handleLogout}
+              variant="contained"
+              color="error"
+            >
               Logout
-            </button>
-          </div>
+            </Button>
+          </Box>
         )}
-      </div>
-    </nav>
+      </Toolbar>
+    </AppBar>
   );
 }

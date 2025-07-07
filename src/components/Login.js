@@ -1,7 +1,17 @@
+// src/components/Login.js
 import React, { useState } from 'react';
 import { auth } from '../firebase';
 import { signInWithEmailAndPassword } from 'firebase/auth';
 import { useNavigate, Link } from 'react-router-dom';
+
+import Container from '@mui/material/Container';
+import Card from '@mui/material/Card';
+import CardContent from '@mui/material/CardContent';
+import TextField from '@mui/material/TextField';
+import Typography from '@mui/material/Typography';
+import Button from '@mui/material/Button';
+import Alert from '@mui/material/Alert';
+import Box from '@mui/material/Box';
 
 export default function Login() {
   const [email, setEmail] = useState('');
@@ -21,57 +31,86 @@ export default function Login() {
   };
 
   return (
-    <div className="container d-flex justify-content-center align-items-center vh-100">
-      <div 
-        className="p-4 rounded"
-        style={{
-          maxWidth: '400px',
+    <Container
+      maxWidth="sm"
+      sx={{
+        height: '100vh',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center'
+      }}
+    >
+      <Card
+        sx={{
           width: '100%',
-          backgroundColor: '#F5F5F5',
-          boxShadow: '0 0 10px rgba(0,0,0,0.1)'
+          maxWidth: 400,
+          boxShadow: 3,
+          bgcolor: '#F5F5F5'
         }}
       >
-        <div className="text-center mb-4">
-          <img 
-            src="/WeichertLogoCoverImage.png" 
-            alt="Weichert Logo"
-            style={{ width: '180px', marginBottom: '10px' }}
-          />
-          <h2>Agent Login</h2>
-        </div>
+        <CardContent>
+          <Box sx={{ textAlign: 'center', mb: 2 }}>
+            <img
+              src="/WeichertLogoCoverImage.png"
+              alt="Weichert Logo"
+              style={{ width: '180px', marginBottom: '10px' }}
+            />
+            <Typography variant="h5" gutterBottom>
+              Agent Login
+            </Typography>
+          </Box>
 
-        {error && <div className="alert alert-danger">{error}</div>}
+          {error && (
+            <Alert severity="error" sx={{ mb: 2 }}>
+              {error}
+            </Alert>
+          )}
 
-        <form onSubmit={handleLogin}>
-          <input
-            type="email"
-            placeholder="Email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            className="form-control mb-3"
-            required
-          />
-          <input
-            type="password"
-            placeholder="Password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            className="form-control mb-3"
-            required
-          />
-          <button
-            type="submit"
-            className="btn btn-weichert w-100 mb-2"
-            style={{ backgroundColor: '#FFCC00', color: '#000' }}
-          >
-            Login
-          </button>
-        </form>
+          <Box component="form" onSubmit={handleLogin}>
+            <TextField
+              label="Email"
+              type="email"
+              fullWidth
+              required
+              margin="normal"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+            />
 
-        <p className="text-center mt-3">
-          Don’t have an account? <Link to="/signup">Sign up here</Link>
-        </p>
-      </div>
-    </div>
+            <TextField
+              label="Password"
+              type="password"
+              fullWidth
+              required
+              margin="normal"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+            />
+
+            <Button
+              type="submit"
+              variant="contained"
+              color="primary"
+              fullWidth
+              sx={{
+                mt: 2,
+                color: '#000',
+                fontWeight: 'bold',
+                '&:hover': { bgcolor: '#f1e000' }
+              }}
+            >
+              Login
+            </Button>
+          </Box>
+
+          <Typography variant="body2" align="center" sx={{ mt: 3 }}>
+            Don’t have an account?{' '}
+            <Link to="/signup" style={{ textDecoration: 'underline' }}>
+              Sign up here
+            </Link>
+          </Typography>
+        </CardContent>
+      </Card>
+    </Container>
   );
 }

@@ -1,8 +1,17 @@
+// src/components/Listings.js
 import React, { useEffect, useState } from 'react';
 import { db } from '../firebase';
 import { collection, getDocs } from 'firebase/firestore';
 import { useUser } from '../UserContext';
 import { Navigate } from 'react-router-dom';
+
+import Container from '@mui/material/Container';
+import Typography from '@mui/material/Typography';
+import Grid from '@mui/material/Grid';
+import Card from '@mui/material/Card';
+import CardContent from '@mui/material/CardContent';
+import Box from '@mui/material/Box';
+import Slide from '@mui/material/Slide';
 
 export default function Listings() {
   const { user } = useUser();
@@ -20,29 +29,54 @@ export default function Listings() {
   if (!user) return <Navigate to="/" />;
 
   return (
-    <div className="container fade-in py-5">
-      <h2 className="mb-4">Our Listings & Open Houses</h2>
-      <div className="row">
-        {listings.map(listing => {
+    <Container sx={{ py: 5 }}>
+      <Typography variant="h4" gutterBottom>
+        Our Listings & Open Houses
+      </Typography>
+      <Grid container spacing={3}>
+        {listings.map((listing, idx) => {
           const hasOpenHouse = listing['Open House Upcoming'] && listing['Open House Upcoming'].trim() !== '';
           return (
-            <div className="col-md-4 mb-4" key={listing.id}>
-              <div className={`card h-100 ${hasOpenHouse ? 'highlight-open-house' : ''}`}>
-                <div className="card-body">
-                  <h5 className="card-title">{listing['Address']}, {listing['City']}</h5>
-                  <p><strong>MLS #:</strong> {listing['MLS #']}</p>
-                  <p><strong>Status:</strong> {listing['Status']}</p>
-                  <p><strong>Price:</strong> {listing['Current Price']}</p>
-                  <p><strong>Beds:</strong> {listing['Beds']} | <strong>Baths:</strong> {listing['Baths']}</p>
-                  <p><strong>Office:</strong> {listing['List Office Name']}</p>
-                  <p><strong>Open House Upcoming:</strong> {listing['Open House Upcoming'] || 'N/A'}</p>
-                  <p><strong>Open House Count:</strong> {listing['Open House Count'] || '0'}</p>
-                </div>
-              </div>
-            </div>
+            <Slide
+              direction="up"
+              in={true}
+              timeout={400 + idx * 100} // 👈 stagger each card
+              key={listing.id}
+            >
+              <Grid item xs={12} sm={6} md={4}>
+                <Card
+                  sx={{
+                    height: '100%',
+                    border: hasOpenHouse ? '2px solid #fff200' : '1px solid #ddd',
+                    boxShadow: 3
+                  }}
+                >
+                  <CardContent>
+                    <Typography variant="h6">
+                      {listing['Address']}, {listing['City']}
+                    </Typography>
+                    <Box sx={{ mt: 1 }}>
+                      <Typography variant="body2"><strong>MLS #:</strong> {listing['MLS #']}</Typography>
+                      <Typography variant="body2"><strong>Status:</strong> {listing['Status']}</Typography>
+                      <Typography variant="body2"><strong>Price:</strong> {listing['Current Price']}</Typography>
+                      <Typography variant="body2">
+                        <strong>Beds:</strong> {listing['Beds']} | <strong>Baths:</strong> {listing['Baths']}
+                      </Typography>
+                      <Typography variant="body2"><strong>Office:</strong> {listing['List Office Name']}</Typography>
+                      <Typography variant="body2">
+                        <strong>Open House Upcoming:</strong> {listing['Open House Upcoming'] || 'N/A'}
+                      </Typography>
+                      <Typography variant="body2">
+                        <strong>Open House Count:</strong> {listing['Open House Count'] || '0'}
+                      </Typography>
+                    </Box>
+                  </CardContent>
+                </Card>
+              </Grid>
+            </Slide>
           );
         })}
-      </div>
-    </div>
+      </Grid>
+    </Container>
   );
 }

@@ -1,9 +1,23 @@
+// src/components/Signup.js
 import React, { useState } from 'react';
 import { auth, db, storage } from '../firebase';
 import { createUserWithEmailAndPassword } from 'firebase/auth';
 import { doc, setDoc } from 'firebase/firestore';
 import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 import { useNavigate, Link } from 'react-router-dom';
+
+import Container from '@mui/material/Container';
+import Card from '@mui/material/Card';
+import CardContent from '@mui/material/CardContent';
+import TextField from '@mui/material/TextField';
+import Typography from '@mui/material/Typography';
+import Button from '@mui/material/Button';
+import Alert from '@mui/material/Alert';
+import Box from '@mui/material/Box';
+import FormControl from '@mui/material/FormControl';
+import InputLabel from '@mui/material/InputLabel';
+import Select from '@mui/material/Select';
+import MenuItem from '@mui/material/MenuItem';
 
 export default function Signup() {
   const [name, setName] = useState('');
@@ -19,11 +33,9 @@ export default function Signup() {
   const handleSignup = async (e) => {
     e.preventDefault();
     try {
-      // 1️⃣ Create Auth user
       const userCredential = await createUserWithEmailAndPassword(auth, email, password);
       const user = userCredential.user;
 
-      // 2️⃣ Upload profile photo if provided
       let photoURL = '';
       if (photoFile) {
         const storageRef = ref(storage, `profilePhotos/${user.uid}`);
@@ -31,7 +43,6 @@ export default function Signup() {
         photoURL = await getDownloadURL(storageRef);
       }
 
-      // 3️⃣ Save to Firestore
       await setDoc(doc(db, 'users', user.uid), {
         name,
         phone,
@@ -48,105 +59,149 @@ export default function Signup() {
   };
 
   return (
-    <div className="container d-flex justify-content-center align-items-center vh-100">
-      <div 
-        className="p-4 rounded"
-        style={{
-          maxWidth: '400px',
+    <Container
+      maxWidth="sm"
+      sx={{
+        height: '100vh',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center'
+      }}
+    >
+      <Card
+        sx={{
           width: '100%',
-          backgroundColor: '#F5F5F5',
-          boxShadow: '0 0 10px rgba(0,0,0,0.1)'
+          maxWidth: 400,
+          boxShadow: 3,
+          bgcolor: '#F5F5F5'
         }}
       >
-        <div className="text-center mb-4">
-          <img 
-            src="/WeichertLogoCoverImage.png"
-            alt="Weichert Logo"
-            style={{ width: '180px', marginBottom: '10px' }}
-          />
-          <h2>Agent Signup</h2>
-        </div>
+        <CardContent>
+          <Box sx={{ textAlign: 'center', mb: 2 }}>
+            <img
+              src="/WeichertLogoCoverImage.png"
+              alt="Weichert Logo"
+              style={{ width: '180px', marginBottom: '10px' }}
+            />
+            <Typography variant="h5" gutterBottom>
+              Agent Signup
+            </Typography>
+          </Box>
 
-        {errorMessage && (
-          <div className="alert alert-danger">{errorMessage}</div>
-        )}
+          {errorMessage && (
+            <Alert severity="error" sx={{ mb: 2 }}>
+              {errorMessage}
+            </Alert>
+          )}
 
-        <form onSubmit={handleSignup}>
-          <input
-            type="text"
-            placeholder="Name"
-            value={name}
-            onChange={(e) => setName(e.target.value)}
-            className="form-control mb-3"
-            required
-          />
+          <Box component="form" onSubmit={handleSignup}>
+            <TextField
+              label="Name"
+              fullWidth
+              required
+              margin="normal"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+            />
 
-          <input
-            type="tel"
-            placeholder="Phone"
-            value={phone}
-            onChange={(e) => setPhone(e.target.value)}
-            className="form-control mb-3"
-            required
-          />
+            <TextField
+              label="Phone"
+              fullWidth
+              required
+              margin="normal"
+              value={phone}
+              onChange={(e) => setPhone(e.target.value)}
+            />
 
-          <select
-            value={office}
-            onChange={(e) => setOffice(e.target.value)}
-            className="form-select mb-3"
-            required
-          >
-            <option value="">Select Office</option>
-            <option value="BlueBell">Blue Bell</option>
-            <option value="ChaddsFord">Chadds Ford</option>
-            <option value="Collegeville">Collegeville</option>
-            <option value="Doylestown">Doylestown</option>
-            <option value="Philadelphia">Philadelphia</option>
-            <option value="Wayne">Wayne</option>
-            <option value="WestChester">West Chester</option>
-            <option value="Wilmington">Wilmington</option>
-          </select>
+            <FormControl fullWidth margin="normal" required>
+              <InputLabel id="office-label">Office</InputLabel>
+              <Select
+                labelId="office-label"
+                value={office}
+                label="Office"
+                onChange={(e) => setOffice(e.target.value)}
+              >
+                <MenuItem value="">Select Office</MenuItem>
+                <MenuItem value="BlueBell">Blue Bell</MenuItem>
+                <MenuItem value="ChaddsFord">Chadds Ford</MenuItem>
+                <MenuItem value="Collegeville">Collegeville</MenuItem>
+                <MenuItem value="Doylestown">Doylestown</MenuItem>
+                <MenuItem value="Philadelphia">Philadelphia</MenuItem>
+                <MenuItem value="Wayne">Wayne</MenuItem>
+                <MenuItem value="WestChester">West Chester</MenuItem>
+                <MenuItem value="Wilmington">Wilmington</MenuItem>
+              </Select>
+            </FormControl>
 
-          <input
-            type="email"
-            placeholder="Email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            className="form-control mb-3"
-            required
-          />
+            <TextField
+              label="Email"
+              type="email"
+              fullWidth
+              required
+              margin="normal"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+            />
 
-          <input
-            type="password"
-            placeholder="Password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            className="form-control mb-3"
-            required
-          />
+            <TextField
+              label="Password"
+              type="password"
+              fullWidth
+              required
+              margin="normal"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+            />
 
-          {/* ✅ New: Profile photo file picker */}
-          <label className="form-label">Upload Profile Photo</label>
-          <input
-            type="file"
-            accept="image/*"
-            onChange={(e) => setPhotoFile(e.target.files[0])}
-            className="form-control mb-3"
-          />
+            <Box sx={{ mt: 2 }}>
+              <Typography variant="body2" gutterBottom>
+                Upload Profile Photo
+              </Typography>
+              <Button
+                variant="contained"
+                component="label"
+                color="secondary"
+                sx={{ mr: 2 }}
+              >
+                Choose File
+                <input
+                  type="file"
+                  accept="image/*"
+                  hidden
+                  onChange={(e) => setPhotoFile(e.target.files[0])}
+                />
+              </Button>
+              {photoFile && (
+                <Typography variant="body2">
+                  Selected: {photoFile.name}
+                </Typography>
+              )}
+            </Box>
 
-          <button
-            type="submit"
-            className="btn btn-weichert w-100 mb-2"
-            style={{ backgroundColor: '#FFCC00', color: '#000' }}
-          >
-            Sign Up
-          </button>
-        </form>
+            <Button
+              type="submit"
+              variant="contained"
+              color="primary"
+              fullWidth
+              sx={{
+                mt: 3,
+                color: '#000',
+                fontWeight: 'bold',
+                '&:hover': { bgcolor: '#f1e000' }
+              }}
+            >
+              Sign Up
+            </Button>
+          </Box>
 
-        <p className="text-center mt-3">
-          Already have an account? <Link to="/">Login here</Link>
-        </p>
-      </div>
-    </div>
+          <Typography variant="body2" align="center" sx={{ mt: 3 }}>
+            Already have an account?{' '}
+            <Link to="/" style={{ textDecoration: 'underline' }}>
+              Login here
+            </Link>
+          </Typography>
+        </CardContent>
+      </Card>
+    </Container>
   );
 }

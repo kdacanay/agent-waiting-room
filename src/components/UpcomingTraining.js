@@ -1,6 +1,17 @@
+// src/components/UpcomingTraining.js
 import React from 'react';
 import { useUser } from '../UserContext';
 import { Navigate } from 'react-router-dom';
+
+import Container from '@mui/material/Container';
+import Typography from '@mui/material/Typography';
+import Table from '@mui/material/Table';
+import TableBody from '@mui/material/TableBody';
+import TableCell from '@mui/material/TableCell';
+import TableContainer from '@mui/material/TableContainer';
+import TableHead from '@mui/material/TableHead';
+import TableRow from '@mui/material/TableRow';
+import Paper from '@mui/material/Paper';
 
 export default function UpcomingTraining() {
   const { user } = useUser();
@@ -13,28 +24,32 @@ export default function UpcomingTraining() {
   ];
 
   return (
-    <div className="container fade-in py-5">
-      <h2 className="mb-4">Upcoming Training Sessions</h2>
-      <table className="table table-striped">
-        <thead>
-          <tr>
-            <th>Training Topic</th>
-            <th>Date Scheduled</th>
-            <th>Time Scheduled</th>
-            <th>Location</th>
-          </tr>
-        </thead>
-        <tbody>
-          {sampleTrainings.map((training, idx) => (
-            <tr key={idx}>
-              <td>{training.topic}</td>
-              <td>{training.date}</td>
-              <td>{training.time}</td>
-              <td>{training.location}</td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
-    </div>
+    <Container sx={{ py: 5 }}>
+      <Typography variant="h4" gutterBottom>
+        Upcoming Training Sessions
+      </Typography>
+      <TableContainer component={Paper} sx={{ mt: 2 }}>
+        <Table>
+          <TableHead sx={{ bgcolor: '#fff200' }}>
+            <TableRow>
+              <TableCell><strong>Training Topic</strong></TableCell>
+              <TableCell><strong>Date Scheduled</strong></TableCell>
+              <TableCell><strong>Time Scheduled</strong></TableCell>
+              <TableCell><strong>Location</strong></TableCell>
+            </TableRow>
+          </TableHead>
+          <TableBody>
+            {sampleTrainings.map((training, idx) => (
+              <TableRow key={idx}>
+                <TableCell>{training.topic}</TableCell>
+                <TableCell>{training.date}</TableCell>
+                <TableCell>{training.time}</TableCell>
+                <TableCell>{training.location}</TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+      </TableContainer>
+    </Container>
   );
 }
