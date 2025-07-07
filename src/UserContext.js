@@ -1,14 +1,10 @@
 // src/UserContext.js
-import { createContext, useContext, useEffect, useState } from 'react';
+import React, { createContext, useContext, useState, useEffect } from 'react';
 import { auth, db } from './firebase';
 import { onAuthStateChanged } from 'firebase/auth';
 import { doc, getDoc } from 'firebase/firestore';
 
-export const UserContext = createContext();
-
-export function useUser() {
-  return useContext(UserContext);
-}
+const UserContext = createContext();
 
 export function UserProvider({ children }) {
   const [user, setUser] = useState(null);
@@ -17,25 +13,44 @@ export function UserProvider({ children }) {
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (firebaseUser) => {
       if (firebaseUser) {
-        let profile = {};
+        // ✅ Try to get Firestore user doc
         try {
-          const docRef = doc(db, 'users', firebaseUser.uid);
-          const docSnap = await getDoc(docRef);
-          if (docSnap.exists()) {
-            profile = docSnap.data();
-          }
-        } catch (err) {
-          console.error('Error fetching Firestore profile:', err);
-        }
+          const userRef = doc(db, 'users', firebaseUser.uid);
+          const docSnap = await getDoc(userRef);
 
-        setUser({
-          uid: firebaseUser.uid,
-          email: firebaseUser.email || '',
-          displayName: firebaseUser.displayName || profile.name || '',
-          photoURL: profile.photoURL || firebaseUser.photoURL || '',
-          phoneNumber: firebaseUser.phoneNumber || profile.phone || '',
-          office: profile.office || ''
-        });
+          if (docSnap.exists()) {
+            // Merge Firestore fields with auth user
+            setUser({
+              uid: firebaseUser.uid,
+              email: firebaseUser.email,
+              displayName: docSnap.data().name || firebaseUser.displayName || '',
+              phoneNumber: docSnap.data().phone || firebaseUser.phoneNumber || '',
+              office: docSnap.data().office || '',
+              photoURL: docSnap.data().photoURL || firebaseUser.photoURL || '',
+            });
+          } else {
+            // Fallback: no Firestore doc found, just use Firebase Auth user
+            setUser({
+              uid: firebaseUser.uid,
+              email: firebaseUser.email,
+              displayName: firebaseUser.displayName || '',
+              phoneNumber: firebaseUser.phoneNumber || '',
+              office: '',
+              photoURL: firebaseUser.photoURL || '',
+            });
+          }
+        } catch (error) {
+          console.error('🔥 UserContext Firestore error:', error);
+          // Still fallback to auth user
+          setUser({
+            uid: firebaseUser.uid,
+            email: firebaseUser.email,
+            displayName: firebaseUser.displayName || '',
+            phoneNumber: firebaseUser.phoneNumber || '',
+            office: '',
+            photoURL: firebaseUser.photoURL || '',
+          });
+        }
       } else {
         setUser(null);
       }
@@ -50,4 +65,8 @@ export function UserProvider({ children }) {
       {children}
     </UserContext.Provider>
   );
+}
+
+export function useUser() {
+  return useContext(UserContext);
 }
