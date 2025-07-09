@@ -2,7 +2,8 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import { useUser } from '../UserContext';
-
+import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
+import { db } from '../firebase';
 import Container from '@mui/material/Container';
 import Typography from '@mui/material/Typography';
 import Box from '@mui/material/Box';
@@ -17,6 +18,8 @@ import Checkbox from '@mui/material/Checkbox';
 import RadioGroup from '@mui/material/RadioGroup';
 import Radio from '@mui/material/Radio';
 import Button from '@mui/material/Button';
+
+
 
 export default function WaitingRoomForm() {
   const { roomType } = useParams();
@@ -99,7 +102,44 @@ export default function WaitingRoomForm() {
       payload.requestedTraining = formData.trainingNeeded.join(', ');
     }
 
-    console.log('Payload:', payload);
+    try {
+      const response = await fetch('https://default9467b82f9011484fa3be93bfc08381.8e.environment.api.powerplatform.com:443/powerautomate/automations/direct/workflows/991d8cf2fdc44cfbbe5dbd43828da76b/triggers/manual/paths/invoke/?api-version=1&tenantId=tId&environmentName=Default-9467b82f-9011-484f-a3be-93bfc083818e&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=p9LvS1TZUKvpuQYolMDcw2srB3OhLWFte7EBqQR59S8', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      });
+
+      if (response.ok) {
+        // ✅ Add log to Firestore too
+        await addDoc(collection(db, 'waitingRoomLogs'), {
+          userId: user.uid,
+          name: user.displayName || '',
+          email: user.email || '',
+          roomType,
+          payload,
+          submittedAt: serverTimestamp(),
+        });
+
+        setStatusMessage('✅ Submitted successfully!');
+        setFormData({
+          name: '',
+          email: '',
+          phone: '',
+          office: '',
+          availableDays: [],
+          preferredTime: '',
+          openHouseGoal: '',
+          preferredTasks: [],
+          trainingNeeded: []
+        });
+      } else {
+        setStatusMessage('❌ Submission failed. Please try again.');
+      }
+    } catch (error) {
+      console.error(error);
+      setStatusMessage('❌ Submission error. Please check your connection.');
+    }
+
 
     try {
       const response = await fetch('https://default9467b82f9011484fa3be93bfc08381.8e.environment.api.powerplatform.com:443/powerautomate/automations/direct/workflows/991d8cf2fdc44cfbbe5dbd43828da76b/triggers/manual/paths/invoke/?api-version=1&tenantId=tId&environmentName=Default-9467b82f-9011-484f-a3be-93bfc083818e&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=p9LvS1TZUKvpuQYolMDcw2srB3OhLWFte7EBqQR59S8', {

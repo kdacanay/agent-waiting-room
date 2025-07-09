@@ -10,6 +10,7 @@ import Typography from '@mui/material/Typography';
 import Avatar from '@mui/material/Avatar';
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
+import Stack from '@mui/material/Stack';
 
 export default function Header() {
   const { user, loading } = useUser();
@@ -21,7 +22,7 @@ export default function Header() {
   };
 
   return (
-    <AppBar position="static" color="primary" sx={{ mb: 2 }}>
+    <AppBar position="static" sx={{ mb: 2, backgroundColor: '#FCF000' }}>
       <Toolbar sx={{ display: 'flex', justifyContent: 'space-between' }}>
         <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
           {loading ? (
@@ -52,32 +53,76 @@ export default function Header() {
             </Typography>
           )}
         </Box>
+
         {user && (
-          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+          <Stack direction="row" spacing={2}>
             <Button
               component={Link}
               to="/dashboard"
               variant="contained"
-              color="secondary"
+              sx={{
+                backgroundColor: '#000',
+                color: '#FCF000',
+                fontWeight: 'bold',
+                '&:hover': {
+                  backgroundColor: '#333',
+                  color: '#FCF000'
+                }
+              }}
             >
               Dashboard
             </Button>
+
             <Button
               component={Link}
               to="/profile"
-              variant="outlined"
-              color="secondary"
+              variant="contained"
+              sx={{
+                backgroundColor: '#000',
+                color: '#FCF000',
+                fontWeight: 'bold',
+                '&:hover': {
+                  backgroundColor: '#333',
+                  color: '#FCF000'
+                }
+              }}
             >
               Profile
             </Button>
+
+            <Button
+              component={Link}
+              to="/activity-history"
+              variant="contained"
+              sx={{
+                backgroundColor: '#000',
+                color: '#FCF000',
+                fontWeight: 'bold',
+                '&:hover': {
+                  backgroundColor: '#333',
+                  color: '#FCF000'
+                }
+              }}
+            >
+              Activity
+            </Button>
+
             <Button
               onClick={handleLogout}
               variant="contained"
-              color="error"
+              sx={{
+                backgroundColor: '#000',
+                color: '#FCF000',
+                fontWeight: 'bold',
+                '&:hover': {
+                  backgroundColor: '#333',
+                  color: '#FCF000'
+                }
+              }}
             >
               Logout
             </Button>
-          </Box>
+          </Stack>
         )}
       </Toolbar>
     </AppBar>
