@@ -1,0 +1,26 @@
+{
+  "apphosting": [
+    {
+      "backendId": "agent-waiting-room",
+      "rootDir": "agent-waiting-room",
+      "ignore": [
+        "node_modules",
+        ".git",
+        "firebase-debug.log",
+        "firebase-debug.*.log",
+        "functions"
+      ]
+    },
+    {
+      "backendId": "agent-waiting-room",
+      "rootDir": "/",
+      "ignore": [
+        "node_modules",
+        ".git",
+        "firebase-debug.log",
+        "firebase-debug.*.log",
+        "functions"
+      ]
+    }
+  ]
+}
